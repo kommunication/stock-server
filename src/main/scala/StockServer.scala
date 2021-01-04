@@ -1,12 +1,12 @@
 import com.google.inject.Inject
 import com.komlan.lab.market.api._
-import com.komlan.lab.market.domain.{Repository, StockRepository, UserRepository}
+import com.komlan.lab.market.domain.{PortfolioRepository, Repository, StockRepository, UserRepository}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.{Controller, HttpServer}
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.util.{Future, FuturePools}
-import scala.reflect.api._
 
+import scala.reflect.api._
 import scala.reflect.ClassTag
 
 //import javax.inject.Inject
@@ -21,6 +21,7 @@ class StockServer extends HttpServer {
     router
       .add[UserController]
       .add[StockController]
+      .add[PortfolioController]
 }
 
 abstract class CrudController[ID, T <: Id[ID]] extends Controller {
@@ -133,7 +134,6 @@ class UserController @Inject()(repository: UserRepository) extends Controller {
 
 }
 
-
 class StockController @Inject() (repository: StockRepository) extends Controller {
   val base = "/stocks"
 
@@ -163,6 +163,24 @@ class StockController @Inject() (repository: StockRepository) extends Controller
   }
 }
 
+class PortfolioController @Inject() (
+                portfolioRepo: PortfolioRepository,
+                userRepo: UserRepository
+              ) extends Controller {
+  get("/users/:userId/portfolios"){request: Request =>
+    val userId = request.getIntParam("userId")
+    userRepo
+      .findById(userId)
+      .flatMap( user => {
+        portfolioRepo.findByUserId(userId)
+      }) match {
+      case None => response.notFound(Message(s"No portfolio found for user $userId"))
+      case portfolio: Portfolio => portfolio
+    }
+
+
+  }
+}
 
 
 //class StockController @Inject() (repo: StockRepository) extends CrudController[String, Stock] {

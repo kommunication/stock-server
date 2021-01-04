@@ -20,4 +20,11 @@ class StockRepository extends  InMemoryRepository[String, Stock] {
 
 }
 
+@Singleton
+class PortfolioRepository extends InMemoryRepository[Int, Portfolio]{
+  def findByUserId(userId: Int) = {
+    repository.get(userId)
+  }
+}
+
 
