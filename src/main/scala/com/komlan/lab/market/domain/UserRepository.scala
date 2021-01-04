@@ -24,7 +24,7 @@ class UserRepository extends InMemoryRepository[Int, User]{
 }
 
 @Singleton
-class StockRepository extends InMemoryRepository[String, Stock] {
+class StockRepository extends InMemoryRepository[String, Stock]  with AutoIncrementCounter {
 
 }
 

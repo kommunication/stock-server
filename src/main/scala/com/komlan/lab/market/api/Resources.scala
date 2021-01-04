@@ -1,5 +1,7 @@
 package com.komlan.lab.market.api
 
+import com.twitter.finatra.http.annotations.RouteParam
+
 import java.util.Date
 
 
@@ -15,9 +17,8 @@ case class Message(message: String)
 
 
 case class User(id: Option[Int], username: String, email: String) extends Entity with Id[Int]
-case class Stock(symbol: String, name: String) extends  Entity with Id[String] {
-  override def id: Option[String] = Option(symbol)
-}
+case class Stock(id:Option[String], symbol: String, name: String) extends  Entity with Id[String]
+
 case class StockQuote(
                        id:Option[Int], symbol: String, date:Date, openPrice: Double,
                        highPrice: Double, lowPrice: Double, closePrice: Double
@@ -25,9 +26,13 @@ case class StockQuote(
 
 
 case class Trade (
-                  id: Option[Int],
-                  tradeType: Int, userId:Int, symbol: String,
-                  quantity: Double, price: Double, date: Date,
+                  id: Option[Int]=None,
+                  tradeType: Int,
+                  userId:Int,
+                  symbol: String,
+                  quantity: Double,
+                  price: Double,
+                  date: Date,
                   status: String
 ) extends Entity with Id[Int]
 
