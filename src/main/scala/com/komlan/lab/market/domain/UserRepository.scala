@@ -6,6 +6,14 @@ import com.twitter.util.{Future, FuturePool}
 
 import scala.collection.mutable
 
+trait AutoIncrementCounter {
+  import java.util.concurrent.atomic.AtomicInteger
+  val idCounter = new AtomicInteger(0)
+
+  def getNextId = idCounter.incrementAndGet()
+}
+
+
 @Singleton
 class UserRepository extends InMemoryRepository[Int, User]{
   import java.util.concurrent.atomic.AtomicInteger
@@ -16,12 +24,18 @@ class UserRepository extends InMemoryRepository[Int, User]{
 }
 
 @Singleton
-class StockRepository extends  InMemoryRepository[String, Stock] {
+class StockRepository extends InMemoryRepository[String, Stock] {
 
 }
 
 @Singleton
-class PortfolioRepository extends InMemoryRepository[Int, Portfolio]{
+class TradeRepository extends InMemoryRepository[Int, Trade] with AutoIncrementCounter
+
+@Singleton
+class PortfolioRepository
+  extends InMemoryRepository[Int, Portfolio]
+    with AutoIncrementCounter {
+
   def findByUserId(userId: Int) = {
     repository.get(userId)
   }

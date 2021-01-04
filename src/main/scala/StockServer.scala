@@ -1,6 +1,6 @@
 import com.google.inject.Inject
 import com.komlan.lab.market.api._
-import com.komlan.lab.market.domain.{PortfolioRepository, Repository, StockRepository, UserRepository}
+import com.komlan.lab.market.domain.{PortfolioRepository, Repository, StockRepository, TradeRepository, UserRepository}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.{Controller, HttpServer}
 import com.twitter.finatra.http.routing.HttpRouter
@@ -165,9 +165,15 @@ class StockController @Inject() (repository: StockRepository) extends Controller
 
 class PortfolioController @Inject() (
                 portfolioRepo: PortfolioRepository,
-                userRepo: UserRepository
+                userRepo: UserRepository,
+                tradeRepo: TradeRepository
               ) extends Controller {
-  get("/users/:userId/portfolios"){request: Request =>
+
+
+  // get portfolio
+  // /trades -> get all
+      // ?symboi=TWITTER => get all trade from twitter
+  get("/users/:userId/portfolio"){request: Request =>
     val userId = request.getIntParam("userId")
     userRepo
       .findById(userId)
@@ -178,6 +184,22 @@ class PortfolioController @Inject() (
       case portfolio: Portfolio => portfolio
     }
 
+
+  }
+
+  post("/users/:userId/trades"){ trade: Trade =>
+
+    val entity = trade.id match {
+      case None => trade.copy(id = Option(tradeRepo.getNextId))
+      case _ => trade
+    }
+
+    tradeRepo
+      .save(entity)
+
+    response
+      .created
+      .location(s"/users/${entity.userId}/trades/${entity.id}")
 
   }
 }

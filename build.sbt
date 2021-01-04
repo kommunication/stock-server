@@ -1,4 +1,4 @@
-name := "testScala"
+name := "lab-stock-market"
 
 version := "0.1"
 
