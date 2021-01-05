@@ -50,8 +50,16 @@ case class Portfolio (
 
 
 object Portfolio {
+
+
   /**
-   * Complex methods
+   * Given a portfolio and a list of incoming trades, applies the trades subject to
+   * available budget (portfolio.balance) and return a copy of the portfolio with
+   * updated balance and list of new stock positions.
+   *
+   * @param portfolio
+   * @param allTrades
+   * @return
    */
   def applyTrades(portfolio:Portfolio, allTrades: Seq[Trade]): Option[Portfolio] = {
     val currentPositions = portfolio.stocks
