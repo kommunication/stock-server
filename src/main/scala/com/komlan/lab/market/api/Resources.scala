@@ -2,6 +2,7 @@ package com.komlan.lab.market.api
 
 import com.twitter.finatra.http.annotations.RouteParam
 
+import java.time.LocalDate
 import java.util.Date
 
 
@@ -14,7 +15,7 @@ trait Id[ID] { entity: Entity =>
 case class Message(message: String)
 
 /**
- * Represent the user of the system
+ * Represents the user of the system
  * @param id
  * @param username
  * @param email
@@ -46,3 +47,42 @@ case class Portfolio (
          balance: Double, // Cash balance (initial or current)
          stocks: List[StockPosition]
 ) extends Entity with Id[Int]
+
+
+object Portfolio {
+  /**
+   * Complex methods
+   */
+  def applyTrades(portfolio:Portfolio, allTrades: Seq[Trade]): Option[Portfolio] = {
+    val currentPositions = portfolio.stocks
+    val additionPositions = allTrades
+      .groupBy(t => t.symbol)
+      .map({
+        case (symbol, trades) => {
+          val quantity = trades.foldLeft(0.0)((s, t) => s + (if (t.tradeType == "1") +t.quantity else -t.quantity))
+          val cost = trades.foldLeft(0.0)((s, t) => s + (if (t.tradeType == "1") +t.price else -t.price))
+          (symbol, quantity, cost)
+        }
+      })
+
+    val newBalance = additionPositions.foldLeft(portfolio.balance)((s, v) => s + v._3)
+
+    if (newBalance < 0.0) {
+      None  // Can't apply trades that overdraw budget
+    } else {
+
+      val newPositions:List[StockPosition] = additionPositions.map({
+        case (symbol, quantityToAdd, _) => {
+          val position = currentPositions
+            .find(p => p.symbol ==  symbol)
+            .getOrElse(StockPosition(userId=portfolio.userId, portfolioId=portfolio.id.get, symbol=symbol, quantity=0.0))
+          position.copy(quantity = position.quantity + quantityToAdd)
+        }
+      }).toList
+
+
+      Some(portfolio.copy(balance = newBalance, stocks = newPositions))
+    }
+
+  }
+}
