@@ -52,4 +52,6 @@ class UserController @Inject()(repository: UserRepository) extends Controller {
 
   }
 
+
+
 }
