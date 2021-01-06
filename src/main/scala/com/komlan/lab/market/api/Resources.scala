@@ -1,9 +1,15 @@
 package com.komlan.lab.market.api
 
+import com.fasterxml.jackson.core.`type`.TypeReference
+import com.fasterxml.jackson.module.scala.JsonScalaEnumeration
+import com.komlan.lab.market.api.TradeType.{Buy, Sell, TradeType}
 import com.twitter.finatra.http.annotations.RouteParam
+import com.twitter.finatra.jackson.ScalaObjectMapper
+import com.twitter.inject.Logging
 
 import java.time.LocalDate
 import java.util.Date
+
 
 
 trait Entity
@@ -26,9 +32,20 @@ case class StockQuote( id:Option[Int], symbol: String, date:Date, openPrice: Dou
                        highPrice: Double, lowPrice: Double, closePrice: Double
 ) extends Entity with Id[Int]
 
+object TradeType extends Enumeration {
+  type TradeType = Value
+  val Buy = Value("buy")
+  val Sell = Value("sell")
+}
+
+class TradeTypeType extends TypeReference[TradeType.type]
+case class TradeTypeHolder(@JsonScalaEnumeration(classOf[TradeTypeType]) tradeType: TradeType.TradeType)
+
+
 case class Trade (
                    id: Option[Int]=None,
-                   tradeType: Int,
+                   @JsonScalaEnumeration(classOf[TradeTypeType])
+                   tradeType: TradeType,
                    userId:Int,
                    symbol: String,
                    quantity: Double,
@@ -46,10 +63,13 @@ case class Portfolio (
          userId: Int,
          balance: Double, // Cash balance (initial or current)
          stocks: List[StockPosition]
-) extends Entity with Id[Int]
+) extends Entity with Id[Int] {
+
+  def getStockPosition(symbol: String): Option[StockPosition] = stocks.find((p: StockPosition) => p.symbol == symbol)
+}
 
 
-object Portfolio {
+object Portfolio extends Logging {
 
 
   /**
@@ -58,17 +78,17 @@ object Portfolio {
    * updated balance and list of new stock positions.
    *
    * @param portfolio
-   * @param allTrades
+   * @param newTrades
    * @return
    */
-  def applyTrades(portfolio:Portfolio, allTrades: Seq[Trade]): Option[Portfolio] = {
+  def applyTrades(portfolio:Portfolio, newTrades: Seq[Trade]): Option[Portfolio] = {
     val currentPositions = portfolio.stocks
-    val additionPositions = allTrades
+    val additionPositions = newTrades
       .groupBy(t => t.symbol)
       .map({
         case (symbol, trades) => {
-          val quantity = trades.foldLeft(0.0)((s, t) => s + (if (t.tradeType == "1") +t.quantity else -t.quantity))
-          val cost = trades.foldLeft(0.0)((s, t) => s + (if (t.tradeType == "1") +t.price else -t.price))
+          val quantity = trades.foldLeft(0.0)((s, t) => s + (if (t.tradeType == Buy) t.quantity else -t.quantity))
+          val cost = trades.foldLeft(0.0)((s, t) => s + (if (t.tradeType == Buy) -t.price else t.price))
           (symbol, quantity, cost)
         }
       })
@@ -76,9 +96,10 @@ object Portfolio {
     val newBalance = additionPositions.foldLeft(portfolio.balance)((s, v) => s + v._3)
 
     if (newBalance < 0.0) {
+      warn(s"Unable to apply new trades to portfolio (${portfolio.id}). Reason: new balance negative ($newBalance)")
       None  // Can't apply trades that overdraw budget
     } else {
-
+      info(s"Applying trades to portfolio (${portfolio.id}). New balance ($newBalance)")
       val newPositions:List[StockPosition] = additionPositions.map({
         case (symbol, quantityToAdd, _) => {
           val position = currentPositions
@@ -92,5 +113,21 @@ object Portfolio {
       Some(portfolio.copy(balance = newBalance, stocks = newPositions))
     }
 
+  }
+
+
+  def loadStockQuotation(jsonFile: String): Unit ={
+
+
+    val mapper = ScalaObjectMapper()
+    val jsonStr =
+      """
+        |{
+        | "username": "komlan",
+        | "email":"komlan@gmail.com"
+        |}
+        |""".stripMargin
+
+    val json = mapper.parse[User](jsonStr)
   }
 }

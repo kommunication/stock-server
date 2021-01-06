@@ -41,4 +41,10 @@ class PortfolioRepository
   }
 }
 
+@Singleton
+class StockQuoteRepository
+  extends InMemoryRepository[Int, StockQuote]
+  with AutoIncrementCounter {
+
+}
 
