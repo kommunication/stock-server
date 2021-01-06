@@ -58,12 +58,12 @@ object Portfolio {
    * updated balance and list of new stock positions.
    *
    * @param portfolio
-   * @param allTrades
+   * @param newTrades
    * @return
    */
-  def applyTrades(portfolio:Portfolio, allTrades: Seq[Trade]): Option[Portfolio] = {
+  def applyTrades(portfolio:Portfolio, newTrades: Seq[Trade]): Option[Portfolio] = {
     val currentPositions = portfolio.stocks
-    val additionPositions = allTrades
+    val additionPositions = newTrades
       .groupBy(t => t.symbol)
       .map({
         case (symbol, trades) => {
