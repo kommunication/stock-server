@@ -51,9 +51,6 @@ libraryDependencies ++= Seq(
   , "org.scalactic" %% "scalactic" % versions.scalatest  % "test"
   , "org.scalatest" %% "scalatest" % versions.scalatest % "test"
 
-//  //JSON
-//  ,"com.lihaoyi" %% "upickle" % "0.7.1"
-//  ,"com.lihaoyi" %% "os-lib" % "0.7.1"
 
 )
 
@@ -65,7 +62,7 @@ enablePlugins(sbtdocker.DockerPlugin, JavaAppPackaging)
 dockerfile in docker := {
   val jarFile = artifactPath.in(Compile, packageBin).value
   val classpath = (managedClasspath in Compile).value
-  val mainclass =  "com.komlan.lab.market.StockServer"
+  val mainClass =  "com.komlan.lab.market.StockServer"
   val jarTarget = s"/app/${jarFile.getName}"
   // Make a colon separated classpath with the JAR file
   val classpathString = classpath.files.map("/app/" + _.getName).mkString(":") + ":" + jarTarget
@@ -88,24 +85,7 @@ dockerfile in docker := {
     // On launch run Java with the classpath and the main class
     entryPointShell("java",
       "${JAVA_OPTS}",
-//      "-XX:+PrintGC",
-//      "-XX:+PrintGCDetails",
-//      "-XX:+PrintGCDateStamps",
-//      "-Xloggc:/logs/YmsServer-${INSTANCE_NAME}.gc.log",
-//      "-XX:+UseGCLogFileRotation",
-//      "-XX:NumberOfGCLogFiles=10",
-//      "-XX:GCLogFileSize=2M",
-//      //"-Xlog:gc*:file=/logs/YmsService-${INSTANCE_NAME}.gc.log:utctime,uptime,level,tags:filecount=10,filesize=1024000",
-//      "-XX:+HeapDumpOnOutOfMemoryError",
-//      "-XX:HeapDumpPath=/logs",
-//      "-Djava.rmi.server.hostname=${HOSTIP}",
-//      "-Dcom.sun.management.jmxremote",
-//      "-Dcom.sun.management.jmxremote.port=${RMI_PORT}",
-//      "-Dcom.sun.management.jmxremote.rmi.port=${RMI_PORT}",
-//      "-Dcom.sun.management.jmxremote.local.only=false",
-//      "-Dcom.sun.management.jmxremote.authenticate=false",
-//      "-Dcom.sun.management.jmxremote.ssl=false",
-      "-cp", classpathString,  mainclass , "-kafka.state.dir=kafka-stream-state/$HOSTNAME")
+      "-cp", classpathString,  mainClass )
   }
 
 }
