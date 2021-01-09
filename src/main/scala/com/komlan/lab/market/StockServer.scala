@@ -18,18 +18,20 @@ import scala.reflect.ClassTag
 
 object StockServerMain extends StockServer
 
-object MyCustomStatsReceiverModule extends TwitterModule {
-
-  override def configure(): Unit = {
-    bind[StatsReceiver].toInstance(LoadedStatsReceiver.scope("oursvr"))
-  }
-}
+//object MyCustomStatsReceiverModule extends TwitterModule {
+//
+//  override def configure(): Unit = {
+//    bind[StatsReceiver].toInstance(LoadedStatsReceiver.scope("oursvr"))
+//  }
+//}
 class StockServer extends HttpServer {
 
-  override val defaultHttpPort:String = ":8080"
+  override val defaultHttpPort:String = ":80"
+  override val defaultHttpServerName:String = "StockServer"
+
   override def modules: Seq[Module] = Seq(
     StatsReceiverModule,
-    DefaultModule
+    //DefaultModule
   )
 
   override protected def start(): Unit = {
@@ -48,77 +50,3 @@ class StockServer extends HttpServer {
 
   }
 }
-
-abstract class CrudController[ID, T <: Id[ID]] extends Controller {
-  protected val repository: Repository[ID, T]
-  private val futurePool = FuturePools.unboundedPool
-  def base:String
-
-  def getTag()(implicit tag: ClassTag[T]) = tag.getClass
-
-
-  get(base) { request:Request =>
-
-    futurePool {
-
-      val result = repository
-        .findAll()
-        .map({
-          case element: T => Some(element)
-          case _ => None
-        })
-
-      response.ok(result)
-
-    }
-  }
-
-  /**
-   * Get specific user
-   */
-  get(base + "/:id") { request: Request =>
-    repository
-      .findById(request.getParam("id").asInstanceOf[ID]) match {
-      case None => response.notFound(Message(s"User with id ${request.getIntParam("id")} not found"))
-      case Some(user) => user
-    }
-  }
-
-  delete(base + "/:id"){ request:Request =>
-    repository
-      .deleteById(request.getParam("id").asInstanceOf[ID])
-  }
-//
-//  /**
-//   *  Create new user
-//   */
-//  post(base) { user: T =>
-//
-////    val toSave = user.id match {
-////      case None => user.copy(id=Option(repository.getNextId))
-////      case _ => user
-////    }
-//    val toSave = user
-//
-//    repository
-//      .save(toSave)
-//
-//    response
-//      .created
-//      .location(s"$base/${toSave.id.get}")
-//
-//  }
-}
-
-
-
-
-
-
-
-
-//class com.komlan.lab.market.api.StockController @Inject() (repo: StockRepository) extends com.komlan.lab.market.CrudController[String, Stock] {
-//  override def base = "/stocks"
-//
-//  override protected val repository: Repository[String, Stock] = repo
-//}

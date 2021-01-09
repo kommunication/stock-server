@@ -4,6 +4,9 @@ import com.google.inject.{Inject, Singleton}
 import com.komlan.lab.market.api._
 import com.twitter.util.{Future, FuturePool}
 
+import java.nio.file.Paths
+import java.util.Date
+import java.text.SimpleDateFormat
 import scala.collection.mutable
 
 trait AutoIncrementCounter {
@@ -44,7 +47,20 @@ class PortfolioRepository
 @Singleton
 class StockQuoteRepository
   extends InMemoryRepository[Int, StockQuote]
-  with AutoIncrementCounter {
+    with AutoIncrementCounter
+  {
+    val fmt = new SimpleDateFormat("yyyMMdd")
+    def getDataFileForDate( date: Date) = {
+      val dataPath = "data"
+      Paths.get(dataPath, s"quotes-by-date-${fmt.format(date)}.csv").toString
+    }
+    def getDataFileForSymbol( symbol: String) = {
+      val dataPath = "data"
+      Paths.get(dataPath, s"quotes-by-symbol-${symbol}.csv").toString
+    }
 
+    def getAllQuotesForDate(date: Date):List[StockQuote] = StockQuote.readFromCsv(getDataFileForDate(date), false)
+
+    def getAllQuotesForSymbol(symbol: String): List[StockQuote] = StockQuote.readFromCsv(getDataFileForSymbol(symbol), false)
 }
 

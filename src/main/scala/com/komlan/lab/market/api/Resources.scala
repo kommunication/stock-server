@@ -3,10 +3,12 @@ package com.komlan.lab.market.api
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.module.scala.JsonScalaEnumeration
 import com.komlan.lab.market.api.TradeType.{Buy, Sell, TradeType}
+import com.komlan.lab.market.utils.{CSV, DateUtils}
 import com.twitter.finatra.http.annotations.RouteParam
 import com.twitter.finatra.jackson.ScalaObjectMapper
 import com.twitter.inject.Logging
 
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
 
@@ -29,8 +31,29 @@ case class Message(message: String)
 case class User(id: Option[Int], username: String, email: String) extends Entity with Id[Int]
 case class Stock(id:Option[String], symbol: String, name: String) extends  Entity with Id[String]
 case class StockQuote( id:Option[Int], symbol: String, date:Date, openPrice: Double,
-                       highPrice: Double, lowPrice: Double, closePrice: Double
+                       highPrice: Double, lowPrice: Double, closePrice: Double, volume: Long
 ) extends Entity with Id[Int]
+
+object StockQuote {
+  def readFromCsv(filename: String, skipHeader:Boolean = true): List[StockQuote] = {
+    implicit val formatter = new SimpleDateFormat("yyyyMMdd")
+    //20170202,AAPL,127.975,129.39,127.78,128.53
+    CSV.readCvsFromFile(filename, skipHeader)
+      .filter(row => row.nonEmpty && row.size >= 7)
+      .map(row =>
+        StockQuote(
+          date = DateUtils.getDateFromString(row(0)),
+          symbol = row(1),
+          openPrice = row(2).toDouble,
+          highPrice = row(3).toDouble,
+          lowPrice = row(4).toDouble,
+          closePrice = row(5).toDouble,
+          volume = row(6).toLong,
+          id = None
+        )
+      ).toList
+  }
+}
 
 object TradeType extends Enumeration {
   type TradeType = Value
@@ -51,9 +74,26 @@ case class Trade (
                    quantity: Double,
                    price: Double,
                    date: Date,
-                   status: String
+                   status: String = "Created"
 ) extends Entity with Id[Int]
 
+object Trade {
+  def readFromCsv(filename: String): List[Trade] = {
+    implicit val formatter = new SimpleDateFormat("yyyyMMdd")
+    CSV.readCvsFromFile(filename)
+      .filter(row => row.nonEmpty && row.size >= 6)
+      .map(row =>
+        Trade(
+          date = DateUtils.getDateFromString(row(0)),
+          symbol = row(1),
+          tradeType = TradeType.withName(row(2)),
+          quantity = row(3).toDouble,
+          price = row(5).toDouble,
+          userId = -1
+        )
+      ).toList
+  }
+}
 // Trade status // for audit
 
 case class StockPosition(userId: Int, portfolioId: Int, symbol: String, quantity: Double)
@@ -117,8 +157,6 @@ object Portfolio extends Logging {
 
 
   def loadStockQuotation(jsonFile: String): Unit ={
-
-
     val mapper = ScalaObjectMapper()
     val jsonStr =
       """

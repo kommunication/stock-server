@@ -1,0 +1,4 @@
+Date,Symbol,BuyOrSell,Quantity,sharePrice,totalPrice
+01/05/2017,GOOGL,buy,10,1722.5,17225.0
+,intentionally,wrong
+01/06/2017,GOOGL,buy,5,1702.3,17023.0

@@ -1,10 +1,8 @@
-name := "lab-stock-market"
+name := "komlan-stock-market"
 
 version := "0.1"
 
-//scalaVersion := "2.13.4"
 scalaVersion := "2.12.8"
-//ThisBuild / useCoursier := false
 
 val versions = new {
   val finatra = "20.12.0"
@@ -17,6 +15,7 @@ val versions = new {
 
 libraryDependencies ++= Seq(
   "com.twitter" %% "finatra-http" % versions.finatra,
+  "com.twitter" %% "finatra-validation" % versions.finatra,
   "com.twitter" %% "finatra-slf4j" % "2.12.0", // % versions.finatra,
   "ch.qos.logback" % "logback-classic" % versions.logback,
   "com.twitter" %% "finagle-stats" % versions.finagle,
@@ -45,8 +44,10 @@ libraryDependencies ++= Seq(
   //  "org.scalatest" %% "scalatest" % "3.0.0" % "test",
   //  "org.specs2" %% "specs2-mock" % "2.4.17" % "test",
 
+  /* Jackson */
+  ,"com.fasterxml.jackson.dataformat" % "jackson-dataformat-csv" % "2.11.2"
 
-  /* Testing */
+  /* Testing framework */
   , "org.mockito" % "mockito-core" % versions.mockito % "test"
   , "org.scalactic" %% "scalactic" % versions.scalatest  % "test"
   , "org.scalatest" %% "scalatest" % versions.scalatest % "test"

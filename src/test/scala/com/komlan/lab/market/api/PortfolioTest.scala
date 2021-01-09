@@ -1,13 +1,16 @@
 package com.komlan.lab.market.api
 
 
+import com.fasterxml.jackson.dataformat.csv.{CsvMapper, CsvSchema}
 import com.komlan.lab.market.api.TradeType._
-import com.komlan.lab.market.utils.SQuote
+import com.komlan.lab.market.utils.{CSV, DateUtils, RawTrade, SQuote}
 import com.twitter.finatra.jackson.ScalaObjectMapper
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
+import java.io.ByteArrayInputStream
 import java.util.Date
 import java.time.LocalDate
+import scala.jdk.CollectionConverters.asScalaIteratorConverter
 
 class PortfolioTest extends FunSuite with BeforeAndAfter {
 
@@ -135,4 +138,69 @@ class PortfolioTest extends FunSuite with BeforeAndAfter {
     assert(quotes.head.open == 160.52)
 
   }
+
+  test("read trade data csv "){
+    implicit val formatter = DateUtils.formatter_mmddyyyy
+    /**
+     *  From test/resources/trades.csv
+     *  Date->0,Symbol->1,BuyOrSell->2,Quantity->3,sharePrice->4,totalPrice->5
+     */
+    val trades = CSV.readCvsFromResource("trades.csv")
+      .filter(row => row.nonEmpty && row.size >= 6)
+      .map(row =>
+        Trade(
+            date = DateUtils.getDateFromString(row(0)),
+            symbol = row(1),
+            tradeType = TradeType.withName(row(2)),
+            quantity = row(3).toDouble,
+            price = row(5).toDouble,
+            userId = -1
+          )
+      ).toList
+
+    assert(trades.nonEmpty)
+    assert(trades.size == 2)
+    assert(trades.head.symbol == "GOOGL")
+    assert(trades.head.quantity == 10.0)
+    val trades2 = trades.tail
+    assert(trades2.head.quantity == 5.0)
+  }
+
+  test("read trade data csv from file "){
+    implicit val formatter = DateUtils.formatter_mmddyyyy
+    /**
+     *  Note --> copy to external and change path to valid external csv file
+     *
+     *  Date,Symbol,BuyOrSell,Quantity,sharePrice,totalPrice
+     *  01/10/2017,AAPL,buy,10,1722.5,17225.0
+     *  01/12/2017,GOOGL,buy,5,1702.3,17023.0
+     *  01/13/2017,AAPL,buy,100,702.3,7023.0
+     *
+     *  Date->0,Symbol->1,BuyOrSell->2,Quantity->3,sharePrice->4,totalPrice->5
+     */
+
+
+
+    val trades = CSV.readCvsFromFile("c:\\projects\\trades_external.csv")
+      .filter(row => row.nonEmpty && row.size >= 6)
+      .map(row =>
+        Trade(
+          date = DateUtils.getDateFromString(row(0)),
+          symbol = row(1),
+          tradeType = TradeType.withName(row(2)),
+          quantity = row(3).toDouble,
+          price = row(5).toDouble,
+          userId = -1
+        )
+      ).toList
+
+    assert(trades.nonEmpty)
+    assert(trades.size == 3)
+    val firstTrade = trades.head
+    assert(firstTrade.quantity == 10.0)
+    assert(firstTrade.symbol == "AAPL")
+    val secondTrade:Trade = trades.tail.head
+    assert(secondTrade.quantity == 5.0)
+  }
+
 }
