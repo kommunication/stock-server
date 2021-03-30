@@ -16,7 +16,8 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 
-.idea/
+.idea/git st
+.bsp/
 
 .gradle/
 build/
