@@ -6,6 +6,6 @@ RUN sbt universal:packageBin
 FROM openjdk:8-jre
 WORKDIR /root/
 COPY --from=builder /usr/src/app/target/universal/komlan-stock-market-0.1.zip .
-RUN unzip /root/komlan-stock-market-0.1.zip && chmod +x /root/komlan-stock-market-0.1/bin/lab-stock-market
+RUN unzip /root/komlan-stock-market-0.1.zip && chmod +x /root/komlan-stock-market-0.1/bin/komlan-stock-market
 ENTRYPOINT ["./komlan-stock-market-0.1/bin/komlan-stock-market"]
 CMD []
