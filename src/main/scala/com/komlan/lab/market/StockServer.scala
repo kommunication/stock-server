@@ -19,6 +19,7 @@ import com.twitter.util.{FuturePool, FuturePools}
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 object StockServerMain extends StockServer
@@ -30,15 +31,11 @@ class StockServer extends HttpServer {
   override val defaultHttpServerName:String = "StockServer"
 
   override def modules: Seq[Module] = Seq(
-    StatsReceiverModule,
-    //DefaultModule
+    StatsReceiverModule
   )
 
-  override protected def start(): Unit = {
-    println("...... In start ...... ")
-  }
   override protected def configureHttp(router: HttpRouter): Unit = {
-    println("...... configureHttp ...... ")
+
     router
       .filter[CommonFilters]
       .filter[LoggingMDCFilter[Request, Response]]
@@ -49,18 +46,19 @@ class StockServer extends HttpServer {
   }
 
   override protected def setup(): Unit = {
-    println("...... In setup ...... ")
+
     val setupService = injector.instance[SetupService]
     val setupFuture = setupService.runSetup
 
-    setupFuture onSuccess{ case (users, stocks, quotes) =>
-      info(s"Done with setup. Got  ${users.size} users, ${stocks.size} stocks, ${quotes.size} quotes")
-    }
-
-    setupFuture onFailure  { error =>
-      warn(s"Unexpected output from setup. Root cause; ${error.getMessage}")
+    setupFuture onComplete {
+      case Success((users, stocks, quotes, trades)) => {
+        info(s"Done with setup. Got  ${users.size} users, ${stocks.size} stocks, ${quotes.size} quotes")
+      }
+      case Failure(error)  =>
+        warn(s"Unexpected output from setup. Root cause; ${error.getMessage}")
     }
   }
+
   override protected def warmup(): Unit = {
 
   }

@@ -4,11 +4,13 @@ import com.google.inject.Inject
 import com.komlan.lab.market.api.TradeType._
 import com.komlan.lab.market.domain.http.{PortfolioEvaluateGetRequest, TradePostRequest}
 import com.komlan.lab.market.domain.{PortfolioRepository, QuoteSpecification, StockQuoteRepository, StockRepository, TradeRepository, TradeSpecification, UserRepository}
-import com.komlan.lab.market.utils.{DateUtils, SQuote}
+import com.komlan.lab.market.utils.{CSV, DateUtils, SQuote}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import com.twitter.finatra.http.request.RequestUtils
 import com.twitter.finatra.jackson.ScalaObjectMapper
 import com.twitter.util.FuturePool
+import sun.util.resources.cldr.es.CalendarData_es_SV
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Paths
@@ -21,8 +23,8 @@ class PortfolioController @Inject()(
  tradeRepo: TradeRepository,
  stockRepo: StockRepository,
  stockQuoteRepository: StockQuoteRepository
-
 ) extends Controller {
+
   implicit val formatter = DateUtils.formatter_mmddyyyy
 
   get("/users/:userId/portfolio/evaluate") { request: PortfolioEvaluateGetRequest =>
@@ -35,7 +37,7 @@ class PortfolioController @Inject()(
       .withHourOfDay(23)
       .withMinuteOfHour(59)
       .withSecondOfMinute(59)
-      .toDate // DateUtils.getDateFromLocalDate(request.dateTo)
+      .toDate
 
 
     userRepo
@@ -92,7 +94,6 @@ class PortfolioController @Inject()(
 
   }
 
-
   post("/users/:userId/trades") { request: TradePostRequest =>
     val userId = request.userId
     userRepo
@@ -111,6 +112,35 @@ class PortfolioController @Inject()(
       }
     }
 
+
+
+
+  }
+
+  post("/users/:userId/trades/upload") { request: Request =>
+    val formData = RequestUtils.multiParams(request)
+    var content:String = ""
+    for ((key, item) <- formData) {
+      if (item.isFormField)
+        info(s"$key -> ${item.data.toString}")
+      else {
+        content = (item.data.map(_.toChar)).mkString
+        info(s"${key} -> filename: ${item.filename}")
+      }
+
+    }
+    info(s"Got CSV content: $content")
+    val trades = Trade.readFromCsvString(content)
+
+
+    response.ok().json(
+      s"""
+        |{
+        | "keys": ${formData.keys},
+        | "fileContent": ${content},
+        | "trades": $trades
+        |}
+        |""".stripMargin)
 
   }
 

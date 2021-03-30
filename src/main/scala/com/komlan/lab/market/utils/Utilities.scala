@@ -28,14 +28,14 @@ object DateUtils {
 
 object CSV {
   def readCvsFromFile(f: String, skipHeader:Boolean = true): Iterator[Array[String]] =
-    processCsvLine(Source.fromFile(f).getLines, skipHeader)
+    processCsvLines(Source.fromFile(f).getLines, skipHeader)
 
   def readCvsFromResource(f: String, skipHeader:Boolean = true): Iterator[Array[String]] =
-    processCsvLine(Source.fromResource(f).getLines, skipHeader)
+    processCsvLines(Source.fromResource(f).getLines, skipHeader)
 
-  private def processCsvLine(src: Iterator[String], skipHeader:Boolean = true):Iterator[Array[String]] = {
+  def processCsvLines(src: Iterator[String], skipHeader:Boolean = true):Iterator[Array[String]] = {
     // assuming first line is a header
-    val headerLine = if (!skipHeader) src.take(1).next else ""
+    if (skipHeader) src.take(1).next else ""
 
     // processing remaining lines
     for (l <- src)

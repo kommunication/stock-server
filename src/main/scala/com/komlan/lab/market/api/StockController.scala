@@ -1,11 +1,14 @@
 package com.komlan.lab.market.api
 
 import com.google.inject.Inject
-import com.komlan.lab.market.domain.StockRepository
+import com.komlan.lab.market.domain.http.StockQuoteGetRequest
+import com.komlan.lab.market.domain.{StockQuoteRepository, StockRepository}
+import com.komlan.lab.market.utils.DateUtils
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import com.twitter.util.FuturePool
 
-class StockController @Inject()(repository: StockRepository) extends Controller {
+class StockController @Inject()(repository: StockRepository, stockQuoteRepository: StockQuoteRepository) extends Controller {
   val base = "/stocks"
 
   get(base) { request: Request =>
@@ -21,6 +24,18 @@ class StockController @Inject()(repository: StockRepository) extends Controller 
       case stock => stock
 
     }
+  }
+
+  get(base + "/:symbol/quotes") { request: StockQuoteGetRequest =>
+    val symbol = request.symbol
+    val dateFrom = request.dateFrom
+    val dateTo = request.dateTo
+
+    FuturePool.unboundedPool {
+      stockQuoteRepository.getAllQuotesForSymbol(symbol, dateFrom, dateTo)
+    }
+
+
   }
 
   post(base) { stock: Stock =>

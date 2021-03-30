@@ -79,8 +79,18 @@ case class Trade (
 
 object Trade {
   def readFromCsv(filename: String): List[Trade] = {
-    implicit val formatter = new SimpleDateFormat("yyyyMMdd")
-    CSV.readCvsFromFile(filename)
+    implicit val formatter = DateUtils.formatter_mmddyyyy
+    readFromCsvText(CSV.readCvsFromFile(filename))
+
+  }
+  def readFromCsvString(text: String): List[Trade] = {
+    implicit val formatter = DateUtils.formatter_mmddyyyy
+    readFromCsvText(CSV.processCsvLines(text.lines))
+  }
+
+  private def readFromCsvText(lines: Iterator[Array[String]]) : List[Trade] = {
+    implicit val formatter = DateUtils.formatter_mmddyyyy
+    lines
       .filter(row => row.nonEmpty && row.size >= 6)
       .map(row =>
         Trade(
@@ -94,9 +104,19 @@ object Trade {
       ).toList
   }
 }
-// Trade status // for audit
+
 
 case class StockPosition(userId: Int, portfolioId: Int, symbol: String, quantity: Double)
+
+
+/**
+ * Represents a User's porfolio, a list of stock positions
+ * @param id
+ * @param name
+ * @param userId
+ * @param balance
+ * @param stocks
+ */
 case class Portfolio (
          id:Option[Int],
          name: String="",

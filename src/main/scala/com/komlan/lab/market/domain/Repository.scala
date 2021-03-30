@@ -6,7 +6,7 @@ import scala.collection.mutable
 import com.komlan.lab.market.api._
 
 trait Repository[ID, T <: Id[ID]] {
-  def save(entity: T): Future[Unit]
+  def save(entity: T) : Option[T]
 
   def delete(entity: T): Unit
 
@@ -21,9 +21,9 @@ class InMemoryRepository[ID, T <: Id[ID]] extends Repository[ID, T] {
 
   val repository: mutable.HashMap[ID, T] = new mutable.HashMap[ID, T]() // In memory
 
-  override def save(entity: T): Future[Unit] = FuturePool.unboundedPool {
+  override def save(entity: T) =
     repository.put(entity.id.get, entity)
-  }
+
 
   override def delete(entity: T): Unit = repository.remove(entity.id.get)
 

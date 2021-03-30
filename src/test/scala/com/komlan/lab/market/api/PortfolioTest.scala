@@ -145,7 +145,7 @@ class PortfolioTest extends FunSuite with BeforeAndAfter {
      *  From test/resources/trades.csv
      *  Date->0,Symbol->1,BuyOrSell->2,Quantity->3,sharePrice->4,totalPrice->5
      */
-    val trades = CSV.readCvsFromResource("trades.csv")
+    val trades = CSV.readCvsFromResource("trades.csv", true)
       .filter(row => row.nonEmpty && row.size >= 6)
       .map(row =>
         Trade(
@@ -181,7 +181,7 @@ class PortfolioTest extends FunSuite with BeforeAndAfter {
 
 
 
-    val trades = CSV.readCvsFromFile("c:\\projects\\trades_external.csv")
+    val trades = CSV.readCvsFromFile("C:\\Projects\\trades_external.csv")
       .filter(row => row.nonEmpty && row.size >= 6)
       .map(row =>
         Trade(
