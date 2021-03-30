@@ -1,6 +1,6 @@
 # Stock Market Simulation
 
-An illustrative implementation of a backend RESTful service.
+An illustrative implementation of a backend RESTful service using Scala, Finatra and a custom in-memory data structure.
 
 ## Structure of Source Code
 ```
