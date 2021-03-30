@@ -40,6 +40,23 @@ A Dockerfile is included to build a single local docker image. All files and dat
 - Repository pattern with a concreate implementation of an in-memory data store
 - CRUD operations for User, Stock, Trade 
 
+### Endpoints
+
+```
+GET     /users
+GET     /users/:id
+DELETE  /users/:id
+POST    /users
+GET     /stocks
+GET     /stocks/:symbol
+GET     /stocks/:symbol/quotes
+POST    /stocks
+GET     /users/:userId/portfolio/evaluate
+GET     /users/:userId/trades
+POST    /users/:userId/trades
+POST    /users/:userId/trades/upload
+
+```
 ## Semantic of Domain Entities
 - User: A user of the app
 - Stock: Designation of a particular stock identified by a ticker symbol
