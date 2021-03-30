@@ -12,6 +12,7 @@ import scala.io.Source
 
 object Implicits {
   implicit val formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH)
+  implicit def anyToOption[A](a: A): Option[A] = Option(a)
 }
 object DateUtils {
   val formatter_yyyymmdd = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH)

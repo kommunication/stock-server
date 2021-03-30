@@ -17,7 +17,7 @@ project/plugins/project/
 .worksheet
 
 .idea/
-.bsp/
+.bsp/*
 
 .gradle/
 build/
