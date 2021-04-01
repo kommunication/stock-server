@@ -75,6 +75,6 @@ POST    /users/:userId/trades/upload
 ## Limitations
 Due to time and scope limitation, many apsects of this application are illustrative in nature.  
 - There is no front-end included. The best way to test the API is by using `Postnam` or similar tools
-- API implementation is not fully fleshed out. The emphasis was put on demonstrating various aspects as of the implementation as basis for broader conversation.
+- API implementation is not fully fleshed out. The emphasis was put on demonstrating various aspects of the implementation as basis for broader conversation.
 - Error handling and edge case handling have been included but are not comprehensive.
 
