@@ -6,19 +6,19 @@ An illustrative implementation of a backend RESTful service using Scala, Finatra
 ```
 ├───data					      |-> Data files (loaded at startup, in-memory data store)
 ├───src						      |-> Source root for Scala SBT project
-│   ├───main					      |-> Main source
-│   │   ├───resources				      |-> Resource files
-│   │   └───scala				      |-> Root for scala source files
+│   ├───main					  |-> Main source
+│   │   ├───resources			  |-> Resource files
+│   │   └───scala				  |-> Root for scala source files
 │   │       └───com
 │   │           └───komlan
 │   │               └───lab
 │   │                   └───market		      
 │   │                       ├───api		      |-> Rest API (Restfull controller, defining endpoints) 
-│   │                       ├───domain		      |-> API resources (i.e. Domain entities): User, Stock, StockPosition, Trade, ...
-│   │                       │   └───http	      |-> Http resources: Request object specification and validation
-│   │                       ├───modules		      |-> Finagle/Finatra module
-│   │                       ├───services	      |-> Contains a SetupService run at startup to seed data store
-│   │                       └───utils		      |-> Utility classes
+│   │                       ├───domain		  |-> API resources (i.e. Domain entities): User, Stock, StockPosition, Trade, ...
+│   │                       │   └───http	  |-> Http resources: Request object specification and validation
+│   │                       ├───modules		  |-> Finagle/Finatra module
+│   │                       ├───services	  |-> Contains a SetupService run at startup to seed data store
+│   │                       └───utils		  |-> Utility classes
 │   └───test
 │       ├───resources
 │       └───scala
@@ -27,13 +27,19 @@ An illustrative implementation of a backend RESTful service using Scala, Finatra
 │                   └───lab
 │                       └───market
 │                           ├───api		      |-> Api Test (illustration only, not full test coverage)
-│                           └───utils		      |-> Test for utilities
+│                           └───utils		  |-> Test for utilities
 
 ```
 
 ## Running
+
+### Running with Docker
 A Dockerfile is included to build a single local docker image. All files and data needed are included but can be replace by mounted volume.
 
+    * `docker build -t stock-server .`
+    * `docker run -p 5000:80 stock-server`
+
+Then query the service endpoints using, for example, `http://localhost:5000/users`. 
 
 ## Features Demonstrated
 - REST endpoint using Scala and Finatra (based on Finagle)
@@ -68,7 +74,7 @@ POST    /users/:userId/trades/upload
 
 ## Limitations
 Due to time and scope limitation, many apsects of this application are illustrative in nature.  
-- There is not front-end included. The best way test the API is by using Postnam or similar tools
+- There is no front-end included. The best way to test the API is by using `Postnam` or similar tools
 - API implementation is not fully fleshed out. The emphasis was put on demonstrating various aspects as of the implementation as basis for broader conversation.
 - Error handling and edge case handling have been included but are not comprehensive.
 
