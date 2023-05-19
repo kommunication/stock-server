@@ -1,8 +1,9 @@
 name := "komlan-stock-market"
+organization := "com.komlan.lab"
 
 version := "0.1"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.12.17"
 
 val versions = new {
   val finatra = "20.12.0"
@@ -23,9 +24,7 @@ libraryDependencies ++= Seq(
   "com.twitter" %% "inject-server" % versions.finatra,
   "com.twitter" %% "inject-app" % versions.finatra,
   "com.twitter" %% "inject-modules" % versions.finatra,
-  //"com.typesafe.akka" %% "akka-stream" % versions.akkaVersion,
 
-  //"ch.qos.logback" % "logback-classic" % versions.logback % Test,
   "com.twitter" %% "finatra-http" % versions.finatra % "test",
   "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
   "com.twitter" %% "inject-server" % versions.finatra % "test",
@@ -50,8 +49,6 @@ libraryDependencies ++= Seq(
   , "org.mockito" % "mockito-core" % versions.mockito % "test"
   , "org.scalactic" %% "scalactic" % versions.scalatest  % "test"
   , "org.scalatest" %% "scalatest" % versions.scalatest % "test"
-
-
 )
 
 

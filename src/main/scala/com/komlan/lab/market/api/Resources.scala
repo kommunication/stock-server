@@ -11,6 +11,7 @@ import com.twitter.inject.Logging
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
+import scala.collection.JavaConverters._
 
 
 
@@ -85,7 +86,7 @@ object Trade {
   }
   def readFromCsvString(text: String): List[Trade] = {
     implicit val formatter = DateUtils.formatter_mmddyyyy
-    readFromCsvText(CSV.processCsvLines(text.lines))
+    readFromCsvText(CSV.processCsvLines(text.lines.toList.iterator().asScala))
   }
 
   private def readFromCsvText(lines: Iterator[Array[String]]) : List[Trade] = {

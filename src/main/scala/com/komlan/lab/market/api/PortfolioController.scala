@@ -10,7 +10,6 @@ import com.twitter.finatra.http.Controller
 import com.twitter.finatra.http.request.RequestUtils
 import com.twitter.finatra.jackson.ScalaObjectMapper
 import com.twitter.util.FuturePool
-import sun.util.resources.cldr.es.CalendarData_es_SV
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Paths

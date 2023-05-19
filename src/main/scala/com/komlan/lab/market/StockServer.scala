@@ -35,7 +35,6 @@ class StockServer extends HttpServer {
   )
 
   override protected def configureHttp(router: HttpRouter): Unit = {
-
     router
       .filter[CommonFilters]
       .filter[LoggingMDCFilter[Request, Response]]
@@ -46,7 +45,6 @@ class StockServer extends HttpServer {
   }
 
   override protected def setup(): Unit = {
-
     val setupService = injector.instance[SetupService]
     val setupFuture = setupService.runSetup
 

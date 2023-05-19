@@ -33,7 +33,7 @@ object CSV {
   def readCvsFromResource(f: String, skipHeader:Boolean = true): Iterator[Array[String]] =
     processCsvLines(Source.fromResource(f).getLines, skipHeader)
 
-  def processCsvLines(src: Iterator[String], skipHeader:Boolean = true):Iterator[Array[String]] = {
+  def processCsvLines(src: Iterator[String], skipHeader:Boolean = true): Iterator[Array[String]] = {
     // assuming first line is a header
     if (skipHeader) src.take(1).next else ""
 
