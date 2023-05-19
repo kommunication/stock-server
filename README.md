@@ -6,19 +6,19 @@ An illustrative implementation of a backend RESTful service using Scala, Finatra
 ```
 ├───data					      |-> Data files (loaded at startup, in-memory data store)
 ├───src						      |-> Source root for Scala SBT project
-│   ├───main					  |-> Main source
-│   │   ├───resources			  |-> Resource files
-│   │   └───scala				  |-> Root for scala source files
+│   ├───main					      |-> Main source
+│   │   ├───resources			              |-> Resource files
+│   │   └───scala				      |-> Root for scala source files
 │   │       └───com
 │   │           └───komlan
 │   │               └───lab
 │   │                   └───market		      
 │   │                       ├───api		      |-> Rest API (Restfull controller, defining endpoints) 
-│   │                       ├───domain		  |-> API resources (i.e. Domain entities): User, Stock, StockPosition, Trade, ...
-│   │                       │   └───http	  |-> Http resources: Request object specification and validation
-│   │                       ├───modules		  |-> Finagle/Finatra module
-│   │                       ├───services	  |-> Contains a SetupService run at startup to seed data store
-│   │                       └───utils		  |-> Utility classes
+│   │                       ├───domain		      |-> API resources (i.e. Domain entities): User, Stock, StockPosition, Trade, ...
+│   │                       │   └───http	      |-> Http resources: Request object specification and validation
+│   │                       ├───modules		      |-> Finagle/Finatra module
+│   │                       ├───services	      |-> Contains a SetupService run at startup to seed data store
+│   │                       └───utils		      |-> Utility classes
 │   └───test
 │       ├───resources
 │       └───scala
@@ -26,8 +26,8 @@ An illustrative implementation of a backend RESTful service using Scala, Finatra
 │               └───komlan
 │                   └───lab
 │                       └───market
-│                           ├───api		      |-> Api Test (illustration only, not full test coverage)
-│                           └───utils		  |-> Test for utilities
+│                           ├───api		       |-> Api Test (illustration only, not full test coverage)
+│                           └───utils		      |-> Test for utilities
 
 ```
 
